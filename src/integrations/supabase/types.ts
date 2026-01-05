@@ -14,125 +14,16 @@ export type Database = {
   }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string
-          display_name: string | null
-          id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      writeups: {
-        Row: {
-          author_id: string | null
-          content: string | null
-          created_at: string
-          description: string | null
-          difficulty: Database["public"]["Enums"]["writeup_difficulty"]
-          id: string
-          platform: string
-          points: number | null
-          published: boolean | null
-          slug: string
-          status: Database["public"]["Enums"]["writeup_status"]
-          tags: string[] | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          author_id?: string | null
-          content?: string | null
-          created_at?: string
-          description?: string | null
-          difficulty: Database["public"]["Enums"]["writeup_difficulty"]
-          id?: string
-          platform: string
-          points?: number | null
-          published?: boolean | null
-          slug: string
-          status?: Database["public"]["Enums"]["writeup_status"]
-          tags?: string[] | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          author_id?: string | null
-          content?: string | null
-          created_at?: string
-          description?: string | null
-          difficulty?: Database["public"]["Enums"]["writeup_difficulty"]
-          id?: string
-          platform?: string
-          points?: number | null
-          published?: boolean | null
-          slug?: string
-          status?: Database["public"]["Enums"]["writeup_status"]
-          tags?: string[] | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "user"
-      writeup_difficulty: "easy" | "medium" | "hard" | "insane"
-      writeup_status: "active" | "completed" | "locked"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -259,10 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "user"],
-      writeup_difficulty: ["easy", "medium", "hard", "insane"],
-      writeup_status: ["active", "completed", "locked"],
-    },
+    Enums: {},
   },
 } as const
