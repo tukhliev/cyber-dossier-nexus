@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Terminal, User, FileCode } from 'lucide-react';
+import { Menu, X, Terminal, User, FileCode, LogIn, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const navItems = [
   { path: '/', label: 'HOME', icon: Terminal },
@@ -12,6 +13,7 @@ const navItems = [
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <>
@@ -68,6 +70,25 @@ export const Navigation = () => {
                 </Link>
               );
             })}
+            
+            {/* Auth button */}
+            {user ? (
+              <button
+                onClick={() => signOut()}
+                className="px-4 py-2 font-mono text-sm tracking-wider text-muted-foreground hover:text-destructive transition-colors flex items-center gap-2"
+              >
+                <LogOut size={14} />
+                LOGOUT
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="px-4 py-2 font-mono text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+              >
+                <LogIn size={14} />
+                LOGIN
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -123,6 +144,35 @@ export const Navigation = () => {
                     </motion.div>
                   );
                 })}
+                
+                {/* Auth button mobile */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: navItems.length * 0.1 }}
+                >
+                  {user ? (
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setIsOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 font-mono text-sm tracking-wider text-muted-foreground border border-transparent hover:text-destructive hover:border-destructive/30 transition-all duration-300 w-full"
+                    >
+                      <LogOut size={16} />
+                      LOGOUT
+                    </button>
+                  ) : (
+                    <Link
+                      to="/auth"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 font-mono text-sm tracking-wider text-muted-foreground border border-transparent hover:text-primary hover:border-primary/30 transition-all duration-300"
+                    >
+                      <LogIn size={16} />
+                      LOGIN
+                    </Link>
+                  )}
+                </motion.div>
               </div>
             </div>
           </motion.div>

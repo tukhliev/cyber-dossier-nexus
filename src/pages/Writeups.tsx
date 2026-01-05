@@ -1,119 +1,19 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, ChevronRight, Shield, Lock, Unlock, Terminal, ExternalLink } from 'lucide-react';
+import { Search, Filter, ChevronRight, Shield, Lock, Unlock, Terminal } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { CyberCard, StatusIndicator } from '../components/ui/CyberCard';
 import { GlitchText } from '../components/ui/GlitchText';
-
-interface Writeup {
-  id: string;
-  title: string;
-  platform: 'HTB' | 'THM' | 'Custom';
-  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Insane';
-  category: string;
-  date: string;
-  status: 'active' | 'completed' | 'locked';
-  points?: number;
-  tags: string[];
-}
-
-const writeups: Writeup[] = [
-  {
-    id: '1',
-    title: 'Cronos',
-    platform: 'HTB',
-    difficulty: 'Medium',
-    category: 'Web + Privilege Escalation',
-    date: '2024-01-15',
-    status: 'completed',
-    points: 30,
-    tags: ['SQLi', 'DNS', 'Cron'],
-  },
-  {
-    id: '2',
-    title: 'Blunder',
-    platform: 'HTB',
-    difficulty: 'Easy',
-    category: 'Web Exploitation',
-    date: '2024-01-10',
-    status: 'completed',
-    points: 20,
-    tags: ['Bludit', 'CVE', 'Sudo'],
-  },
-  {
-    id: '3',
-    title: 'Buffer Overflow Prep',
-    platform: 'THM',
-    difficulty: 'Easy',
-    category: 'Binary Exploitation',
-    date: '2024-01-08',
-    status: 'completed',
-    tags: ['BOF', 'Stack', 'OSCP'],
-  },
-  {
-    id: '4',
-    title: 'Active Directory 101',
-    platform: 'THM',
-    difficulty: 'Medium',
-    category: 'Active Directory',
-    date: '2024-01-05',
-    status: 'completed',
-    tags: ['AD', 'Kerberos', 'BloodHound'],
-  },
-  {
-    id: '5',
-    title: 'Sauna',
-    platform: 'HTB',
-    difficulty: 'Easy',
-    category: 'Active Directory',
-    date: '2024-01-03',
-    status: 'completed',
-    points: 20,
-    tags: ['AD', 'ASREProast', 'DCSync'],
-  },
-  {
-    id: '6',
-    title: 'Forest',
-    platform: 'HTB',
-    difficulty: 'Easy',
-    category: 'Active Directory',
-    date: '2024-01-01',
-    status: 'completed',
-    points: 20,
-    tags: ['AD', 'Exchange', 'DCSync'],
-  },
-  {
-    id: '7',
-    title: 'Blackfield',
-    platform: 'HTB',
-    difficulty: 'Hard',
-    category: 'Active Directory',
-    date: '2023-12-28',
-    status: 'active',
-    points: 40,
-    tags: ['AD', 'LSASS', 'SeBackupPrivilege'],
-  },
-  {
-    id: '8',
-    title: 'Player',
-    platform: 'HTB',
-    difficulty: 'Insane',
-    category: 'Web + Crypto',
-    date: '2023-12-20',
-    status: 'locked',
-    points: 50,
-    tags: ['JWT', 'FFmpeg', 'PHP'],
-  },
-];
+import { useWriteups, Writeup } from '@/hooks/useWriteups';
 
 const platforms = ['All', 'HTB', 'THM', 'Custom'];
-const difficulties = ['All', 'Easy', 'Medium', 'Hard', 'Insane'];
+const difficulties = ['All', 'easy', 'medium', 'hard', 'insane'];
 
 const difficultyColors: Record<string, string> = {
-  Easy: 'text-accent',
-  Medium: 'text-warning',
-  Hard: 'text-destructive',
-  Insane: 'text-purple',
+  easy: 'text-accent',
+  medium: 'text-warning',
+  hard: 'text-destructive',
+  insane: 'text-purple',
 };
 
 const platformColors: Record<string, string> = {
@@ -127,7 +27,9 @@ export const Writeups = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredWriteups = writeups.filter((writeup) => {
+  const { data: writeups = [], isLoading } = useWriteups();
+
+  const filteredWriteups = writeups.filter((writeup: Writeup) => {
     const matchesPlatform = selectedPlatform === 'All' || writeup.platform === selectedPlatform;
     const matchesDifficulty = selectedDifficulty === 'All' || writeup.difficulty === selectedDifficulty;
     const matchesSearch = writeup.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -228,7 +130,7 @@ export const Writeups = () => {
                         }
                       `}
                     >
-                      {difficulty}
+                      {difficulty === 'All' ? 'All' : difficulty.toUpperCase()}
                     </button>
                   ))}
                 </div>
@@ -236,86 +138,98 @@ export const Writeups = () => {
             </CyberCard>
           </motion.div>
 
+          {/* Loading state */}
+          {isLoading && (
+            <div className="text-center py-20">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent animate-spin mx-auto mb-4" />
+              <p className="font-mono text-muted-foreground">Loading writeups...</p>
+            </div>
+          )}
+
           {/* Writeups Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence mode="popLayout">
-              {filteredWriteups.map((writeup, index) => (
-                <motion.div
-                  key={writeup.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
-                  <CyberCard 
-                    variant="glow" 
-                    className="p-6 h-full group cursor-pointer"
-                    onClick={() => console.log('Open writeup:', writeup.id)}
+          {!isLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {filteredWriteups.map((writeup: Writeup, index: number) => (
+                  <motion.div
+                    key={writeup.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`px-2 py-1 border font-mono text-xs ${platformColors[writeup.platform]}`}>
-                        {writeup.platform}
-                      </div>
-                      {writeup.status === 'completed' ? (
-                        <Unlock size={16} className="text-accent" />
-                      ) : writeup.status === 'locked' ? (
-                        <Lock size={16} className="text-destructive" />
-                      ) : (
-                        <div className="w-4 h-4 border border-primary animate-pulse" />
-                      )}
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="font-display text-xl text-foreground mb-2 group-hover:text-primary transition-colors">
-                      {writeup.title}
-                    </h3>
-
-                    {/* Category */}
-                    <p className="font-mono text-sm text-muted-foreground mb-4">
-                      {writeup.category}
-                    </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {writeup.tags.map((tag) => (
-                        <span 
-                          key={tag}
-                          className="px-2 py-0.5 bg-secondary/50 text-secondary-foreground font-mono text-xs"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <div className="flex items-center gap-4">
-                        <span className={`font-mono text-xs ${difficultyColors[writeup.difficulty]}`}>
-                          {writeup.difficulty.toUpperCase()}
-                        </span>
-                        {writeup.points && (
-                          <span className="font-mono text-xs text-muted-foreground">
-                            {writeup.points} pts
-                          </span>
+                    <CyberCard 
+                      variant="glow" 
+                      className="p-6 h-full group cursor-pointer"
+                      onClick={() => console.log('Open writeup:', writeup.slug)}
+                    >
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`px-2 py-1 border font-mono text-xs ${platformColors[writeup.platform] || 'text-foreground border-border'}`}>
+                          {writeup.platform}
+                        </div>
+                        {writeup.status === 'completed' ? (
+                          <Unlock size={16} className="text-accent" />
+                        ) : writeup.status === 'locked' ? (
+                          <Lock size={16} className="text-destructive" />
+                        ) : (
+                          <div className="w-4 h-4 border border-primary animate-pulse" />
                         )}
                       </div>
-                      <StatusIndicator status={writeup.status} />
-                    </div>
 
-                    {/* Hover indicator */}
-                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ChevronRight size={16} className="text-primary" />
-                    </div>
-                  </CyberCard>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                      {/* Title */}
+                      <h3 className="font-display text-xl text-foreground mb-2 group-hover:text-primary transition-colors">
+                        {writeup.title}
+                      </h3>
+
+                      {/* Description */}
+                      {writeup.description && (
+                        <p className="font-mono text-sm text-muted-foreground mb-4 line-clamp-2">
+                          {writeup.description}
+                        </p>
+                      )}
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {writeup.tags.map((tag) => (
+                          <span 
+                            key={tag}
+                            className="px-2 py-0.5 bg-secondary/50 text-secondary-foreground font-mono text-xs"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between pt-4 border-t border-border">
+                        <div className="flex items-center gap-4">
+                          <span className={`font-mono text-xs ${difficultyColors[writeup.difficulty]}`}>
+                            {writeup.difficulty.toUpperCase()}
+                          </span>
+                          {writeup.points && (
+                            <span className="font-mono text-xs text-muted-foreground">
+                              {writeup.points} pts
+                            </span>
+                          )}
+                        </div>
+                        <StatusIndicator status={writeup.status} />
+                      </div>
+
+                      {/* Hover indicator */}
+                      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ChevronRight size={16} className="text-primary" />
+                      </div>
+                    </CyberCard>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* Empty state */}
-          {filteredWriteups.length === 0 && (
+          {!isLoading && filteredWriteups.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -323,33 +237,35 @@ export const Writeups = () => {
             >
               <Terminal size={48} className="mx-auto text-muted-foreground mb-4" />
               <p className="font-mono text-muted-foreground">
-                No writeups found matching your criteria.
+                No writeups found. {writeups.length === 0 ? 'Add some writeups to get started.' : 'Try adjusting your filters.'}
               </p>
             </motion.div>
           )}
 
           {/* Stats footer */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-12 pt-8 border-t border-border"
-          >
-            <div className="flex flex-wrap justify-center gap-8 font-mono text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">TOTAL:</span>
-                <span className="text-foreground">{writeups.length}</span>
+          {writeups.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="mt-12 pt-8 border-t border-border"
+            >
+              <div className="flex flex-wrap justify-center gap-8 font-mono text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">TOTAL:</span>
+                  <span className="text-foreground">{writeups.length}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">COMPLETED:</span>
+                  <span className="text-accent">{writeups.filter((w: Writeup) => w.status === 'completed').length}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">IN PROGRESS:</span>
+                  <span className="text-primary">{writeups.filter((w: Writeup) => w.status === 'active').length}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">COMPLETED:</span>
-                <span className="text-accent">{writeups.filter(w => w.status === 'completed').length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">IN PROGRESS:</span>
-                <span className="text-primary">{writeups.filter(w => w.status === 'active').length}</span>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>

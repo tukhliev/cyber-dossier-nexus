@@ -8,6 +8,7 @@ interface CyberButtonProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export const CyberButton = ({ 
@@ -16,7 +17,8 @@ export const CyberButton = ({
   variant = 'primary',
   size = 'md',
   className = '',
-  disabled = false
+  disabled = false,
+  type = 'button',
 }: CyberButtonProps) => {
   const baseClasses = 'relative font-mono uppercase tracking-wider transition-all duration-300 overflow-hidden group';
   
@@ -34,6 +36,7 @@ export const CyberButton = ({
 
   return (
     <motion.button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       whileHover={{ scale: 1.02 }}
